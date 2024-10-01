@@ -40,10 +40,65 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        let mut p=Person::default();
+        if s.len()==0{
+           return p;
+        }
+
+        let mv: Vec<&str>=s.split(',').collect();
+
+        if mv.len()!=2{
+            return p;
+        }
+
+
+        let mut it=mv.iter();
+
+
+        match it.next(){
+            Some(v)=>{
+                let name=String::from(*v);
+
+
+                if name.len()==0{
+                    return Person::default();
+                }
+                else{
+                    p.name=name;
+                }
+            },
+            None=>{
+                return Person::default();
+            }
+        }
+
+        
+
+        match it.next(){
+            Some(v)=>{
+                let r=(*v).parse::<usize>();
+                match r {
+                    Ok(a)=>{
+                        p.age=a;
+
+                        //assert!(p.name=="Mark"&&p.age==20);
+
+
+                        return p;
+                    }
+                    Err(e)=>{
+                        return Person::default();
+                    }
+                }
+            },
+            None=>{
+                return Person::default();
+            }
+        }
+    
     }
 }
 
@@ -55,6 +110,7 @@ fn main() {
     println!("{:?}", p1);
     println!("{:?}", p2);
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -77,6 +133,10 @@ mod tests {
     fn test_good_convert() {
         // Test that "Mark,20" works
         let p = Person::from("Mark,20");
+
+
+        //println!("name:{},age:{}",p.name,p.age);
+
         assert_eq!(p.name, "Mark");
         assert_eq!(p.age, 20);
     }
