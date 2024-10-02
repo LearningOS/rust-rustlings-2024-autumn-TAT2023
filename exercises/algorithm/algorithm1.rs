@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -14,7 +13,7 @@ struct Node<T> {
     next: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Node<T> {
+impl<T: std::cmp::PartialOrd+Clone> Node<T> {
     fn new(t: T) -> Node<T> {
         Node {
             val: t,
@@ -29,13 +28,14 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: std::cmp::PartialOrd+Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: std::cmp::PartialOrd+Clone> LinkedList<T> {
+
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -72,13 +72,64 @@ impl<T> LinkedList<T> {
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
 		//TODO
-		Self {
+		let mut res=Self {
             length: 0,
             start: None,
             end: None,
+        };
+        //把资源所有权交给mut类型的
+        let mut newlista=list_a;
+        let mut newlistb=list_b;
+
+        let lena=newlista.length as i32;
+        let lenb=newlistb.length as i32;
+        if lena==0&&lenb==0{
+            return  res;
         }
+
+        let mut i=0 as i32;
+        let mut j=0 as i32;
+        while i<lena || j<lenb{
+            let mut select=newlista.get(i);
+
+            if let Some(v)=select{
+                i+=1;
+            }
+            let nb=newlistb.get(j);
+
+            match nb{
+                Some(v2)=>{
+                    match select{
+                        Some(v1)=>{
+                            if  (*v1) > (*v2){
+                                select=nb;
+        
+                                i-=1;     //选的其实是listb
+                                j+=1;
+                            }
+                        },
+                        None=>{
+                            select=Some(v2);
+                            i-=1;
+                            j+=1;
+                        }
+                    }
+
+                },
+                None=>{
+                }
+            }
+            if let Some(v)=select{
+                res.add((*v).clone());
+            }
+        }
+        res
+
 	}
 }
+
+
+
 
 impl<T> Display for LinkedList<T>
 where

@@ -2,9 +2,9 @@
 	double linked list reverse
 	This problem requires you to reverse a doubly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
+use std::os::linux::raw::stat;
 use std::ptr::NonNull;
 use std::vec::*;
 
@@ -74,6 +74,63 @@ impl<T> LinkedList<T> {
     }
 	pub fn reverse(&mut self){
 		// TODO
+        let start=self.start;
+
+        self.end=start;
+
+        let mut head:NonNull<Node<T>>;
+        let mut next:NonNull<Node<T>>;
+        let mut tail:NonNull<Node<T>>;
+
+        match start{
+            Some(nn)=>{
+                head=nn;
+                unsafe {
+                    let temp=(*(nn.as_ptr())).next;
+                    match temp {
+                        Some(nn1)=>{
+                            next=nn1;
+
+                            head.as_mut().next=None;
+                            head.as_mut().prev=Some(next);
+                            
+                        }, 
+                        None=>{  //只有一个节点
+                            return;
+                        }
+                    }
+                }
+            },
+            None=>{
+                return;
+            }
+        }
+
+
+        while true{
+                    unsafe {
+                        let temp=(*(next.as_ptr())).next;
+                        match temp {
+                            Some(nn1)=>{
+                                tail=nn1;   //next的next
+                                next.as_mut().next=Some(head);
+                                next.as_mut().prev=Some(tail);
+
+                                head=next;
+                                next=tail;
+                            }, 
+                            None=>{  //next是最后一个了
+                                next.as_mut().next=Some(head);
+                                next.as_mut().prev=None;
+
+                                self.start=Some(next);
+
+                                return;
+                            }
+                        }
+                    }
+        
+        }
 	}
 }
 
